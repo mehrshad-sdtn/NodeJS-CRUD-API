@@ -79,6 +79,11 @@ exports.putWallets = (req, res) => {
 //------------------------------------------------------
 exports.postWallets = (req, res) => {
  
+    const found_wallet = wallets.find(w => w.name === req.body.name);
+    if (found_wallet !== undefined) {
+       return res.status(400).send("wallet already exists");
+    }
+
     const {error} = validateWallet(req.body);
 
     if (error !== undefined) {
@@ -138,7 +143,7 @@ exports.postCoins = (req, res) => {
 
     if (wallet.coins !== undefined) {
         console.log("here");
-        const found_coin = wallet.coins.find(c => c.name === (req.body.name  || req.body.symbol));
+        const found_coin = wallet.coins.find(c => (c.name === req.body.name)  || (c.symbol === req.body.symbol));
         if (found_coin !== undefined) {
             return res.status(400).send("coin already exists");
         }
