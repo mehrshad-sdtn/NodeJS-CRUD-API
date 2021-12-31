@@ -1,8 +1,9 @@
 const express = require('express');
 const app = express();
-const router = express.Router();
 const Joi = require('joi');
 
+
+app.use(express.json());
 
 const wallets = [];
 
@@ -14,6 +15,18 @@ function validateWallet(wallet) {
     return schema.validate(wallet);
 }
 
+function validateCoin(coin) {
+    const schema = Joi.object({
+        name: Joi.string().min(2).required(),
+        symbol: Joi.string().min(2).required(),
+        amount: Joi.number().required(),
+        rate: Joi.number().required()
+    });
+    return schema.validate(coin);
+}
+
+
+// ------------------------ wallet controllers ---------------------
 
 exports.getWallets = (req, res) => {
     resp = {
@@ -25,7 +38,7 @@ exports.getWallets = (req, res) => {
     res.send(resp);
 };
 
-//-------------------------------------------------------
+//--------------------------------------------
 exports.putWallets = (req, res) => {
     const wallet = wallets.find(
         w => w.name === req.params.wname
@@ -73,7 +86,7 @@ exports.postWallets = (req, res) => {
     }; 
     wallets.push(wallet);
 
-    resp = Object.assign({}, wallet);;
+    resp = Object.assign({}, wallet);
     res.send(
         Object.assign(resp, {
             code: "200", 
@@ -109,10 +122,52 @@ exports.deleteWallets = (req, res) => {
    
 };
 
+//---------------------- coin controllers -------------
 
-//-----------------------------------------------
+exports.postCoins = (req, res) => {
+    const wallet = wallets.find(w => w.name = req.params.wname);
+    const {error} = validateCoin(req.body);
 
+    if (error !== undefined) {
+        res.status(400).send(error.details[0].message);
+        return;
+    }
 
+    const coin = {
+        name: req.body.name,
+        symbol: req.body.symbol,
+        amount: parseFloat(req.body.amount),
+        rate: parseFloat(req.body.rate)
+    };
+
+    wallet.coins.push(coin);
+
+    resp = Object.assign({}, coin);
+    res.send(
+        Object.assign(resp, {
+            code: "200", 
+            message: "Coin added successfully!"
+        })
+    );
+
+};
+
+//--------------------------------------------
+exports.getCoins = (req, res) => {
+    
+    const wallet = wallets.find(w => w.name === req.params.wname);
+    
+    resp = Object.assign({}, wallet);
+    res.send(
+        Object.assign(resp, {
+            code: "200", 
+            message: "All coins recieved successfully!"
+        })
+    );
+    
+};
+
+//-----------------------utils------------------------
 
 function constructTime() {
     let date_ob = new Date();

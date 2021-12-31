@@ -7,13 +7,19 @@ app.use(express.json());
 
 app.get('/', (req, res) => {  res.send('Hello!'); });
 
+app.post('/:wname/coins', controller.postCoins);
+
 app.get('/wallets', controller.getWallets);
+
+app.get('/:wname', controller.getCoins);
 
 app.put('/wallets/:wname', controller.putWallets);
 
 app.post('/wallets', controller.postWallets);
 
 app.delete('/wallets/:wname', controller.deleteWallets);
+
+
 
 
 const port = process.env.PORT || 3000;
