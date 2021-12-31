@@ -141,9 +141,14 @@ exports.deleteWallets = (req, res) => {
 exports.postCoins = (req, res) => {
     const wallet = wallets.find(w => w.name === req.params.wname);
 
+    if (wallet === undefined) {
+        return res.status(404).send("wallet not found");
+    }
+
     if (wallet.coins !== undefined) {
         console.log("here");
-        const found_coin = wallet.coins.find(c => (c.name === req.body.name)  || (c.symbol === req.body.symbol));
+        const found_coin = wallet.coins.find( c => ((c.name === req.body.name)  || (c.symbol === req.body.symbol)) );
+
         if (found_coin !== undefined) {
             return res.status(400).send("coin already exists");
         }
@@ -205,15 +210,18 @@ exports.putCoins = (req, res) => {
     const wallet = wallets.find(w => (w.name === req.params.wname));
 
     if (wallet === undefined) 
-    {   
-        return res.status(404).send('wallet not found');
-    }
+    {  return res.status(404).send('wallet not found'); }
  
     const {error} = validateCoin(req.body);
+
     if (error !== undefined) {
          res.status(400).send(error.details[0].message);
          return;
     }
+
+    if (req.body.symbol !== req.params.symbol)
+    {  return res.status(400).send('incorrect request parameters'); }
+       
 
     let coin = wallet.coins.find(c => (c.symbol === req.params.symbol));
 
