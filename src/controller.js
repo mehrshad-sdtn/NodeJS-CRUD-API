@@ -55,7 +55,7 @@ exports.putWallets = (req, res) => {
 
     if (wallet === undefined) 
     {   
-        return res.status(404).send('wallet not found');
+        return res.status(404).send({code:404, message: 'wallet not found'});
     }
  
     const {error} = validateWallet(req.body);
@@ -81,13 +81,13 @@ exports.postWallets = (req, res) => {
  
     const found_wallet = wallets.find(w => w.name === req.body.name);
     if (found_wallet !== undefined) {
-       return res.status(400).send("wallet already exists");
+       return res.status(400).send({code:400, message: 'wallet already exists'});
     }
 
     const {error} = validateWallet(req.body);
 
     if (error !== undefined) {
-        res.status(400).send(error.details[0].message);
+        res.status(400).send({code:400, message: error.details[0].message});
         return;
     }
 
@@ -117,7 +117,7 @@ exports.deleteWallets = (req, res) => {
 
     if (wallet === undefined) 
     {   
-        return res.status(404).send('wallet not found');
+        return res.status(404).send({code:404, message: 'wallet not found'});
     }
 
    //delete
@@ -142,7 +142,7 @@ exports.postCoins = (req, res) => {
     const wallet = wallets.find(w => w.name === req.params.wname);
 
     if (wallet === undefined) {
-        return res.status(404).send("wallet not found");
+        return res.status(404).send({code:404, message: 'wallet not found'});
     }
 
     if (wallet.coins !== undefined) {
@@ -150,7 +150,7 @@ exports.postCoins = (req, res) => {
         const found_coin = wallet.coins.find( c => ((c.name === req.body.name)  || (c.symbol === req.body.symbol)) );
 
         if (found_coin !== undefined) {
-            return res.status(400).send("coin already exists");
+            return res.status(400).send({code:400, message: 'coin already exists'});
         }
 
     }
@@ -159,7 +159,7 @@ exports.postCoins = (req, res) => {
     const {error} = validateCoin(req.body);
 
     if (error !== undefined) {
-        res.status(400).send(error.details[0].message);
+        res.status(400).send({code:400, message: error.details[0].message});
         return;
     }
 
@@ -193,7 +193,7 @@ exports.getCoins = (req, res) => {
     
     const wallet = wallets.find(w => w.name === req.params.wname);
     if (wallet === undefined){
-        return res.status(404).send('wallet not found');
+        return res.status(404).send({code:404, message: 'wallet not found'});
     }
     resp = Object.assign({}, wallet);
     res.send(
@@ -210,24 +210,24 @@ exports.putCoins = (req, res) => {
     const wallet = wallets.find(w => (w.name === req.params.wname));
 
     if (wallet === undefined) 
-    {  return res.status(404).send('wallet not found'); }
+    {  return res.status(404).send({code:404, message: 'wallet not found'}); }
  
     const {error} = validateCoin(req.body);
 
     if (error !== undefined) {
-         res.status(400).send(error.details[0].message);
+         res.status(400).send({code: 400, message: error.details[0].message});
          return;
     }
 
     if (req.body.symbol !== req.params.symbol)
-    {  return res.status(400).send('incorrect request parameters'); }
+    {  return res.status(400).send({code: 400, message: 'incorrect request params'}); }
        
 
     let coin = wallet.coins.find(c => (c.symbol === req.params.symbol));
 
     if (coin === undefined) 
     {   
-        return res.status(404).send('coin not found');
+        return res.status(404).send({code:404, message: 'coin not found'});
     }
     //update course
     const index = wallet.coins.indexOf(coin);
@@ -255,7 +255,7 @@ exports.deleteCoins = (req, res) => {
 
     if (wallet === undefined) 
     {   
-        return res.status(404).send('wallet not found');
+        return res.status(404).send({code:404, message: 'wallet not found'});
     }
  
 
@@ -263,7 +263,7 @@ exports.deleteCoins = (req, res) => {
 
     if (coin === undefined) 
     {   
-        return res.status(404).send('coin not found');
+        return res.status(404).send({code:404, message: 'coin not found'});
     }
     //update course
     const index = wallet.coins.indexOf(coin);
