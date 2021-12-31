@@ -156,7 +156,9 @@ exports.postCoins = (req, res) => {
 exports.getCoins = (req, res) => {
     
     const wallet = wallets.find(w => w.name === req.params.wname);
-    
+    if (wallet === undefined){
+        return res.status(404).send('wallet not found');
+    }
     resp = Object.assign({}, wallet);
     res.send(
         Object.assign(resp, {
@@ -167,6 +169,71 @@ exports.getCoins = (req, res) => {
     
 };
 
+//--------------------------------------------
+exports.putCoins = (req, res) => {
+    const wallet = wallets.find(w => (w.name === req.params.wname));
+
+    if (wallet === undefined) 
+    {   
+        return res.status(404).send('wallet not found');
+    }
+ 
+    const {error} = validateCoin(req.body);
+    if (error !== undefined) {
+         res.status(400).send(error.details[0].message);
+         return;
+    }
+
+    let coin = wallet.coins.find(c => (c.symbol === req.params.symbol));
+
+    if (coin === undefined) 
+    {   
+        return res.status(404).send('coin not found');
+    }
+    //update course
+    const index = wallet.coins.indexOf(coin);
+    wallet.coins[index] = req.body;
+
+    resp = Object.assign({}, req.body);
+    res.send(
+        Object.assign(resp, {
+            code: "200",
+            message: "Coin updated successfully!"
+        })
+        );
+};
+
+
+//-----------------------------
+exports.deleteCoins = (req, res) => {
+    const wallet = wallets.find(w => (w.name === req.params.wname));
+
+    if (wallet === undefined) 
+    {   
+        return res.status(404).send('wallet not found');
+    }
+ 
+
+    let coin = wallet.coins.find(c => (c.symbol === req.params.symbol));
+
+    if (coin === undefined) 
+    {   
+        return res.status(404).send('coin not found');
+    }
+    //update course
+    const index = wallet.coins.indexOf(coin);
+    wallet.coins.splice(index, 1);
+
+    resp = Object.assign({}, coin);
+    res.send(
+        Object.assign(resp, {
+            code: "200",
+            message: "Coin deleted successfully!"
+        })
+        );
+
+
+};
 //-----------------------utils------------------------
 
 function constructTime() {

@@ -15,9 +15,13 @@ app.get('/:wname', controller.getCoins);
 
 app.put('/wallets/:wname', controller.putWallets);
 
+app.put('/:wname/:symbol', controller.putCoins);
+
 app.post('/wallets', controller.postWallets);
 
 app.delete('/wallets/:wname', controller.deleteWallets);
+
+app.delete('/:wname/:symbol', controller.deleteCoins);
 
 
 
