@@ -25,6 +25,15 @@ function validateCoin(coin) {
     return schema.validate(coin);
 }
 
+function getBalance(wallet) {
+    total = 0;
+    wallet.coins.forEach(coin => {
+        total += coin.amount * coin.rate; 
+    });
+    return total;
+
+}
+
 
 // ------------------------ wallet controllers ---------------------
 
@@ -56,7 +65,7 @@ exports.putWallets = (req, res) => {
     }
     //update course
     wallet.name = req.body.name;
-
+    
     resp = Object.assign({}, wallet);;
     res.send(
         Object.assign(resp, {
@@ -125,7 +134,18 @@ exports.deleteWallets = (req, res) => {
 //---------------------- coin controllers -------------
 
 exports.postCoins = (req, res) => {
-    const wallet = wallets.find(w => w.name = req.params.wname);
+    const wallet = wallets.find(w => w.name === req.params.wname);
+
+    if (wallet.coins !== undefined) {
+        console.log("here");
+        const found_coin = wallet.coins.find(c => c.name === (req.body.name  || req.body.symbol));
+        if (found_coin !== undefined) {
+            return res.status(400).send("coin already exists");
+        }
+
+    }
+    
+
     const {error} = validateCoin(req.body);
 
     if (error !== undefined) {
@@ -143,6 +163,12 @@ exports.postCoins = (req, res) => {
     wallet.coins.push(coin);
 
     resp = Object.assign({}, coin);
+
+    //update balance
+    wallet.balance = getBalance(wallet);
+    //update time
+    wallet.last_updated = constructTime();
+
     res.send(
         Object.assign(resp, {
             code: "200", 
@@ -195,6 +221,12 @@ exports.putCoins = (req, res) => {
     wallet.coins[index] = req.body;
 
     resp = Object.assign({}, req.body);
+
+    //update balance
+    wallet.balance = getBalance(wallet);
+    //update time
+    wallet.last_updated = constructTime();
+
     res.send(
         Object.assign(resp, {
             code: "200",
@@ -225,6 +257,12 @@ exports.deleteCoins = (req, res) => {
     wallet.coins.splice(index, 1);
 
     resp = Object.assign({}, coin);
+
+    //update balance
+    wallet.balance = getBalance(wallet);
+    //update time
+    wallet.last_updated = constructTime();
+
     res.send(
         Object.assign(resp, {
             code: "200",
