@@ -146,7 +146,7 @@ exports.postCoins = (req, res) => {
     }
 
     if (wallet.coins !== undefined) {
-        console.log("here");
+        //console.log("here");
         const found_coin = wallet.coins.find( c => ((c.name === req.body.name)  || (c.symbol === req.body.symbol)) );
 
         if (found_coin !== undefined) {
